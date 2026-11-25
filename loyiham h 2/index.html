@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzat Burger - Premium Fast Food Online Ordering</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#D62828',
+                            orange: '#FF8C42',
+                            warmBg: '#FFF9F3',
+                            dark: '#222222',
+                            yellow: '#FFC857'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFF9F3;
+            color: #222222;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF9F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF8C42;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D62828;
+        }
+        .glass-header {
+            background: rgba(255, 249, 243, 0.92);
+            backdrop-filter: blur(10px);
+        }
+        .active-tab {
+            border-bottom: 3px solid #D62828;
+            color: #D62828;
+            font-weight: 700;
+        }
+        .modal-blur {
+            backdrop-filter: blur(5px);
+        }
+        /* Pulse Animation for Live Order Tracker */
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.05); }
+        }
+        .pulse-badge {
+            animation: pulse-fast 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-orange selection:text-white pb-16 md:pb-0">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-brand-red text-white text-xs md:text-sm py-2 px-4 text-center font-medium flex justify-between items-center px-6">
+        <span class="hidden md:inline"><i class="fa-solid fa-bolt text-brand-yellow mr-2"></i>Toshkent shahri bo'ylab 30 minutda yetkazib beramiz!</span>
+        <span class="mx-auto md:mx-0"><i class="fa-solid fa-phone mr-1"></i> Aloqa markazi: <strong>+998 (71) 200-88-88</strong></span>
+        <span class="hidden md:inline"><i class="fa-solid fa-clock mr-1"></i> 24/7 Bepul xizmat</span>
+    </div>
+
+    <!-- STICKY HEADER -->
+    <header class="sticky top-0 z-40 glass-header border-b border-orange-100 shadow-sm transition-all duration-300" id="mainHeader">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- LOGO -->
+            <a href="#home" onclick="navTo('home')" class="flex items-center gap-2 group">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-red to-brand-orange flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-burger"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-tight text-brand-red block leading-none">LAZZAT</span>
+                    <span class="text-xs font-semibold text-brand-orange tracking-widest uppercase">Burger & Grill</span>
+                </div>
+            </a>
+
+            <!-- NAVIGATION LINKS -->
+            <nav class="hidden lg:flex items-center space-x-8 font-medium text-gray-700">
+                <button onclick="navTo('home')" class="hover:text-brand-red transition-colors nav-link" id="nav-home">Bosh sahifa</button>
+                <button onclick="navTo('menu')" class="hover:text-brand-red transition-colors nav-link" id="nav-menu">Menyu</button>
+                <button onclick="navTo('promotions')" class="hover:text-brand-red transition-colors nav-link" id="nav-promotions">Aktsiyalar</button>
+                <button onclick="navTo('about')" class="hover:text-brand-red transition-colors nav-link" id="nav-about">Biz haqimizda</button>
+                <button onclick="navTo('branches')" class="hover:text-brand-red transition-colors nav-link" id="nav-branches">Filiallar</button>
+            </nav>
+
+            <!-- RIGHT ACTION BUTTONS -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <!-- Search Trigger -->
+                <button onclick="toggleSearchModal()" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-brand-red hover:border-brand-red transition">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
+                <!-- Shopping Cart Button -->
+                <button onclick="openCartDrawer()" class="relative bg-brand-red hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-lg"></i>
+                    <span class="hidden sm:inline">Savat</span>
+                    <span id="cartCountBadge" class="bg-brand-yellow text-brand-dark text-xs font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-brand-red">0</span>
+                </button>
+
+                <!-- User Account Button -->
+                <button onclick="handleUserAuthClick()" class="w-10 h-10 rounded-full bg-orange-100 border border-brand-orange flex items-center justify-center text-brand-red hover:bg-brand-orange hover:text-white transition" title="Foydalanuvchi Kabineti">
+                    <i class="fa-solid fa-user" id="userIcon"></i>
+                </button>
+
+                <!-- Admin Portal Button -->
+                <button onclick="openAdminModal()" class="w-10 h-10 rounded-full bg-gray-800 text-brand-yellow hover:bg-black transition flex items-center justify-center shadow" title="Admin Boshqaruvi">
+                    <i class="fa-solid fa-user-shield"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH OVERLAY MODAL -->
+    <div id="searchModal" class="fixed inset-0 bg-black/60 z-50 hidden modal-blur flex items-start justify-center pt-24 px-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 relative animate-bounce-in">
+            <button onclick="toggleSearchModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><i class="fa-solid fa-magnifying-glass text-brand-red mr-2"></i>Taomlarni qidirish</h3>
+            <div class="relative">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Masalan: Cheese Burger, Pepperoni, Lavash..." class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 pl-12 text-gray-800 focus:outline-none focus:border-brand-red text-lg">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-gray-400 text-lg"></i>
+            </div>
+            <div id="searchResults" class="mt-4 max-h-80 overflow-y-auto divide-y divide-gray-100">
+                <p class="text-gray-400 text-center py-6">Qidirmoqchi bo'lgan taomingiz nomini kiriting...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SPA CONTAINER -->
+    <main id="appContent">
+
+        <!-- HERO SECTION -->
+        <section id="heroSection" class="relative overflow-hidden pt-8 pb-16 md:py-20 bg-gradient-to-b from-orange-50 via-warmBg to-warmBg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Left Content -->
+                <div class="space-y-6 text-center lg:text-left z-10">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 border border-orange-200 text-brand-red font-semibold text-sm">
+                        <span class="w-2.5 h-2.5 rounded-full bg-brand-red animate-ping"></span>
+                        Eng Mazali Fast-Food Brendi
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 leading-tight">
+                        Har bir luqmada <br><span class="text-brand-red underline decoration-brand-yellow decoration-4">haqiqiy lazzat!</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 max-w-xl mx-auto lg:mx-0">
+                        100% halol va yangi so'yilgan go'sht, maxsus retsept bo'yicha tayyorlangan souslar va pechdan yangi uzilgan issiq kulchalar. Order bering, 30 minutda eshigingizda!
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <button onclick="scrollToMenu()" class="bg-brand-red hover:bg-red-700 text-white font-bold text-lg py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition transform flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-utensils"></i> Buyurtma berish
+                        </button>
+                        <button onclick="scrollToMenu()" class="bg-white hover:bg-orange-50 border-2 border-brand-orange text-brand-orange font-bold text-lg py-4 px-8 rounded-2xl shadow-md hover:scale-105 transition transform flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> Menyuni ko'rish
+                        </button>
+                    </div>
+
+                    <!-- Floating Badges -->
+                    <div class="pt-6 grid grid-cols-3 gap-4 border-t border-orange-200">
+                        <div class="flex items-center gap-3 justify-center lg:justify-start">
+                            <div class="w-10 h-10 rounded-xl bg-red-100 text-brand-red flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-truck-fast"></i></div>
+                            <div class="text-left"><h4 class="font-bold text-sm">30 daqiqa</h4><p class="text-xs text-gray-500">Tez yetkazish</p></div>
+                        </div>
+                        <div class="flex items-center gap-3 justify-center lg:justify-start">
+                            <div class="w-10 h-10 rounded-xl bg-orange-100 text-brand-orange flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-certificate"></i></div>
+                            <div class="text-left"><h4 class="font-bold text-sm">100% Halol</h4><p class="text-xs text-gray-500">Sertifikatlangan</p></div>
+                        </div>
+                        <div class="flex items-center gap-3 justify-center lg:justify-start">
+                            <div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-700 flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-fire"></i></div>
+                            <div class="text-left"><h4 class="font-bold text-sm">Issiq Taom</h4><p class="text-xs text-gray-500">Kafolatlangan</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Hero Image -->
+                <div class="relative flex justify-center items-center">
+                    <div class="absolute w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-brand-orange to-brand-yellow rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80" alt="Lazzat Deluxe Burger" class="relative z-10 w-full max-w-md lg:max-w-xl object-contain drop-shadow-2xl hover:scale-105 transition duration-500 rounded-3xl">
+                </div>
+            </div>
+        </section>
+
+        <!-- PROMOTIONS & COMBOS BANNER -->
+        <section id="promotionsSection" class="py-12 bg-white border-y border-orange-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
+                    <div>
+                        <span class="text-brand-orange font-bold uppercase tracking-wider text-sm">Maxsus takliflar</span>
+                        <h2 class="text-3xl font-black text-gray-900 mt-1">Super Aktsiyalar & Setlar</h2>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex items-center gap-2 bg-red-50 text-brand-red px-4 py-2 rounded-xl border border-red-100">
+                        <i class="fa-solid fa-clock text-lg animate-spin"></i>
+                        <span class="font-bold">Shoshiling! Aktsiya tugashiga: <span id="promoCountdown" class="text-black font-mono">04:18:22</span></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Promo 1 -->
+                    <div class="bg-gradient-to-br from-brand-red to-red-800 text-white rounded-3xl p-6 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition duration-300">
+                        <span class="bg-brand-yellow text-black font-black text-xs uppercase px-3 py-1 rounded-full inline-block mb-3">1 + 1 Aksiyasi</span>
+                        <h3 class="text-2xl font-bold mb-2">2 ta Cheese Burger sotib oling</h3>
+                        <p class="text-red-100 text-sm mb-4">Har juma kuni ikkinchi Cheese Burger mutlaqo BEPUL!</p>
+                        <button onclick="applyPromoCode('JUMA1PLUS1')" class="bg-white text-brand-red font-bold px-4 py-2 rounded-xl text-sm shadow hover:bg-orange-50 transition">Kodni nusxalash: JUMA1PLUS1</button>
+                    </div>
+
+                    <!-- Promo 2 -->
+                    <div class="bg-gradient-to-br from-brand-orange to-yellow-600 text-white rounded-3xl p-6 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition duration-300">
+                        <span class="bg-white text-brand-orange font-black text-xs uppercase px-3 py-1 rounded-full inline-block mb-3">-20% Chegirma</span>
+                        <h3 class="text-2xl font-bold mb-2">Oila Combo Seti</h3>
+                        <p class="text-orange-100 text-sm mb-4">4 ta burger + 2 fri + 1.5L Coca-Cola arzon narxda.</p>
+                        <button onclick="filterCategory('setlar')" class="bg-gray-900 text-white font-bold px-4 py-2 rounded-xl text-sm shadow hover:bg-black transition">Setni tanlash</button>
+                    </div>
+
+                    <!-- Promo 3 -->
+                    <div class="bg-gradient-to-br from-gray-900 to-black text-white rounded-3xl p-6 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition duration-300">
+                        <span class="bg-brand-red text-white font-black text-xs uppercase px-3 py-1 rounded-full inline-block mb-3">Bepul Yetkazish</span>
+                        <h3 class="text-2xl font-bold mb-2">Promokod: MAZZALI10</h3>
+                        <p class="text-gray-300 text-sm mb-4">Birinchi buyurtmangiz uchun 10% kafolatlangan chegirma!</p>
+                        <button onclick="applyPromoCode('MAZZALI10')" class="bg-brand-yellow text-brand-dark font-bold px-4 py-2 rounded-xl text-sm shadow hover:bg-yellow-400 transition">Kodni ishlatish</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENU CATALOG SECTION -->
+        <section id="menuSection" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-brand-red font-bold uppercase tracking-wider text-sm">Bizning menyu</span>
+                <h2 class="text-4xl font-black text-gray-900 mt-1">Lazzatli Taomlar Katalogi</h2>
+                <p class="text-gray-600 mt-2">O'zingizga yoqqan kategoriyani tanlang va sevimli taomingizga buyurtma bering</p>
+            </div>
+
+            <!-- CATEGORY FILTERS BAR -->
+            <div class="flex items-center gap-3 overflow-x-auto pb-4 mb-8 scrollbar-none justify-start lg:justify-center" id="categoryBar">
+                <!-- Populated Dynamically via JS -->
+            </div>
+
+            <!-- SORTING & FILTER TOOLBAR -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-orange-100">
+                <div class="text-sm font-semibold text-gray-600">
+                    Topildi: <span id="productCount" class="text-brand-red font-bold text-base">20</span> ta taom
+                </div>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <label for="sortSelect" class="text-sm font-medium text-gray-600 whitespace-nowrap"><i class="fa-solid fa-sort mr-1"></i>Saralash:</label>
+                    <select id="sortSelect" onchange="handleSortChange()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-800 font-medium focus:outline-none focus:border-brand-red w-full sm:w-auto">
+                        <option value="popular">Mashhurligi bo'yicha</option>
+                        <option value="price-asc">Narxi: Arzondan $\rightarrow$ Qimmatga</option>
+                        <option value="price-desc">Narxi: Qimmatdan $\rightarrow$ Arsonga</option>
+                        <option value="rating">Reytingi bo'yicha</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PRODUCT GRID -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Products rendered via JS -->
+            </div>
+        </section>
+
+        <!-- LIVE ORDER STATUS TRACKER BANNER (Dynamic View) -->
+        <section id="activeOrderSection" class="hidden py-12 bg-white border-t border-b border-orange-200">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-brand-orange rounded-3xl p-6 sm:p-8 shadow-xl">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                        <div>
+                            <span class="inline-block px-3 py-1 rounded-full bg-brand-red text-white text-xs font-bold uppercase mb-2">Faol Buyurtma</span>
+                            <h3 class="text-2xl font-black text-gray-900">Buyurtma <span id="trackerOrderId">#ORD-9821</span> Kuzatuvi</h3>
+                            <p class="text-sm text-gray-600">Taxminiy yetkazib berish vaqti: <strong class="text-brand-red">25-30 daqiqa</strong></p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex gap-2">
+                            <button onclick="simulateNextStatus()" class="bg-brand-orange hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">
+                                <i class="fa-solid fa-forward mr-1"></i> Statusni sinash (Demo)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PROGRESS BAR TRACKER -->
+                    <div class="relative py-4">
+                        <div class="overflow-hidden h-3 mb-6 text-xs flex rounded-full bg-gray-200">
+                            <div id="trackerProgressBar" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-brand-orange to-brand-red transition-all duration-700 w-1/4"></div>
+                        </div>
+                        <div class="grid grid-cols-5 text-center text-xs font-bold text-gray-700">
+                            <div id="step-1" class="text-brand-red">
+                                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-brand-red text-white flex items-center justify-center text-sm"><i class="fa-solid fa-check"></i></div>
+                                <span>Qabul qilindi</span>
+                            </div>
+                            <div id="step-2" class="text-gray-400">
+                                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200 flex items-center justify-center text-sm"><i class="fa-solid fa-fire"></i></div>
+                                <span>Tayyorlanmoqda</span>
+                            </div>
+                            <div id="step-3" class="text-gray-400">
+                                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200 flex items-center justify-center text-sm"><i class="fa-solid fa-box font-bold"></i></div>
+                                <span>Topshirildi</span>
+                            </div>
+                            <div id="step-4" class="text-gray-400">
+                                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200 flex items-center justify-center text-sm"><i class="fa-solid fa-motorcycle"></i></div>
+                                <span>Yo'lda</span>
+                            </div>
+                            <div id="step-5" class="text-gray-400">
+                                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200 flex items-center justify-center text-sm"><i class="fa-solid fa-house-chimney"></i></div>
+                                <span>Yetkazildi</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COURIER INFO CARDS -->
+                    <div class="mt-6 pt-6 border-t border-orange-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-full object-cover border-2 border-brand-orange" alt="Kuryer">
+                            <div>
+                                <h4 class="font-bold text-gray-900">Jasurbek Aliyev</h4>
+                                <p class="text-xs text-gray-500">Sizning kuryeringiz (Chevrolet Spark)</p>
+                            </div>
+                            <a href="tel:+998901234567" class="ml-auto w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-lg hover:bg-green-200">
+                                <i class="fa-solid fa-phone"></i>
+                            </a>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500">Manzil:</p>
+                                <p id="trackerAddress" class="font-bold text-gray-800 text-sm">Chilonzor 9-mavze, 24-uy</p>
+                            </div>
+                            <span class="text-xs bg-orange-100 text-brand-orange font-bold px-3 py-1 rounded-full">Naqd pul</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY CHOOSE US & REVIEWS -->
+        <section id="about" class="py-16 bg-white border-t border-orange-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <span class="text-brand-orange font-bold uppercase tracking-wider text-sm">Afzalliklarimiz</span>
+                    <h2 class="text-3xl font-black text-gray-900 mt-1">Nima uchun Aynan Lazzat Burger?</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="p-6 rounded-3xl bg-orange-50 border border-orange-100 text-center hover:scale-105 transition">
+                        <div class="w-16 h-16 rounded-2xl bg-brand-red text-white text-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fa-solid fa-cow"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900 mb-2">Yangi Go'sht</h3>
+                        <p class="text-gray-600 text-sm">Faqat 100% yangi va halol mol go'shti. Hech qanday muzlatilgan yarim tayyor mahsulotlar ishlatilmaydi.</p>
+                    </div>
+
+                    <div class="p-6 rounded-3xl bg-orange-50 border border-orange-100 text-center hover:scale-105 transition">
+                        <div class="w-16 h-16 rounded-2xl bg-brand-orange text-white text-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900 mb-2">30 daqiqada Tezlik</h3>
+                        <p class="text-gray-600 text-sm">Buyurtmangiz 30 daqiqadan kechiksa, keyingi buyurtmangiz uchun 50% chegirma kuponi beriladi.</p>
+                    </div>
+
+                    <div class="p-6 rounded-3xl bg-orange-50 border border-orange-100 text-center hover:scale-105 transition">
+                        <div class="w-16 h-16 rounded-2xl bg-brand-yellow text-brand-dark text-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fa-solid fa-pepper-hot"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900 mb-2">Mualliflik Souslari</h3>
+                        <p class="text-gray-600 text-sm">Bizning oshpazlarimiz tomonidan sirli retsept bo'yicha tayyorlanadigan takrorlanmas souslar.</p>
+                    </div>
+
+                    <div class="p-6 rounded-3xl bg-orange-50 border border-orange-100 text-center hover:scale-105 transition">
+                        <div class="w-16 h-16 rounded-2xl bg-green-600 text-white text-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900 mb-2">A'lo Xizmat</h3>
+                        <p class="text-gray-600 text-sm">Mijozlarimiz mamnuniyati biz uchun birinchi o'rinda. 24/7 qo'llab-quvvatlash markazi.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BRANCHES & CONTACT SECTION -->
+        <section id="branches" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="text-brand-orange font-bold uppercase tracking-wider text-sm">Filiallarimiz va Manzillar</span>
+                    <h2 class="text-3xl font-black text-gray-900 mt-1 mb-6">Bizga Tashrif Buyuring Yoki Qo'ng'iroq Qiling</h2>
+                    
+                    <!-- Branch Tabs -->
+                    <div class="space-y-4">
+                        <div onclick="selectBranch(0)" class="branch-card bg-white p-5 rounded-2xl border-2 border-brand-red shadow-md cursor-pointer transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-lg text-brand-red">Toshkent: Chilonzor Filiali</h4>
+                                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">Ochiq 24/7</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-location-dot text-brand-red mr-2"></i> Chilonzor ko'chasi 19-uy, Metro Mirzo Ulug'bek yonida</p>
+                            <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-phone mr-2"></i> +998 (71) 200-88-81</p>
+                        </div>
+
+                        <div onclick="selectBranch(1)" class="branch-card bg-white p-5 rounded-2xl border border-gray-200 hover:border-brand-orange shadow-sm cursor-pointer transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-lg text-gray-800">Toshkent: Yunusobod Filiali</h4>
+                                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">09:00 - 03:00</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-location-dot text-brand-orange mr-2"></i> Yunusobod 4-mavze, Mega Planet ro'parasi</p>
+                            <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-phone mr-2"></i> +998 (71) 200-88-82</p>
+                        </div>
+
+                        <div onclick="selectBranch(2)" class="branch-card bg-white p-5 rounded-2xl border border-gray-200 hover:border-brand-orange shadow-sm cursor-pointer transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-lg text-gray-800">Samarqand Filiali</h4>
+                                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">10:00 - 23:00</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-location-dot text-brand-orange mr-2"></i> Registon ko'chasi 45-uy</p>
+                            <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-phone mr-2"></i> +998 (66) 230-11-22</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Map Simulation -->
+                <div class="bg-gray-200 rounded-3xl h-96 overflow-hidden relative border-4 border-white shadow-xl flex items-center justify-center">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d191885.5026378411!2d69.13928249826372!3d41.28251254647895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38ae8b0cc379e9c3%3A0xa5a9323b4aa5cb98!2sTashkent%2C%20Uzbekistan!5e0!3m2!1sen!2s!4v1680000000000!5m2!1sen!2s" class="w-full h-full border-0" allowfullscreen="" loading="lazy"></iframe>
+                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md p-3 rounded-xl shadow border border-gray-200 text-xs font-semibold text-gray-800">
+                        <i class="fa-solid fa-street-view text-brand-red mr-1"></i> Barcha filiallarimiz xaritada ko'rsatilgan
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-white pt-12 pb-8 border-t-4 border-brand-red">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-brand-red flex items-center justify-center text-white text-xl">
+                        <i class="fa-solid fa-burger"></i>
+                    </div>
+                    <span class="text-2xl font-black text-white">LAZZAT</span>
+                </div>
+                <p class="text-gray-400 text-sm">O'zbekistondagi eng mazali va tezkor fast-food restoranlar tarmog'i. Har bir luqmada haqiqiy lazzat!</p>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brand-yellow">Menyu</h4>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#menu" onclick="filterCategory('burgerlar')" class="hover:text-brand-orange">Burgerlar</a></li>
+                    <li><a href="#menu" onclick="filterCategory('pitsalar')" class="hover:text-brand-orange">Pitsalar</a></li>
+                    <li><a href="#menu" onclick="filterCategory('lavashlar')" class="hover:text-brand-orange">Lavashlar</a></li>
+                    <li><a href="#menu" onclick="filterCategory('setlar')" class="hover:text-brand-orange">Combo Setlar</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brand-yellow">Mijozlarga</h4>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="#" onclick="openUserModal()" class="hover:text-brand-orange">Shaxsiy Kabinet</a></li>
+                    <li><a href="#" onclick="showActiveOrder()" class="hover:text-brand-orange">Buyurtma Holati</a></li>
+                    <li><a href="#about" class="hover:text-brand-orange">Biz Haqimizda</a></li>
+                    <li><a href="#branches" class="hover:text-brand-orange">Filiallar va Xarita</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brand-yellow">Ijtimoiy Tarmoqlar</h4>
+                <p class="text-sm text-gray-400 mb-4">Bizni kuzatib boring va chegirmalardan xabardor bo'ling:</p>
+                <div class="flex space-x-3 text-lg">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-brand-red flex items-center justify-center transition"><i class="fa-brands fa-telegram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-brand-red flex items-center justify-center transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-brand-red flex items-center justify-center transition"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
+            &copy; 2026 Lazzat Burger Inc. Barcha huquqlar himoyalangan. Onlayn buyurtma platformasi.
+        </div>
+    </footer>
+
+    <!-- MOBILE STICKY BOTTOM BAR -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 flex justify-between items-center z-30 lg:hidden shadow-lg">
+        <button onclick="navTo('home')" class="flex flex-col items-center text-gray-600 hover:text-brand-red">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-xs font-semibold">Bosh sahifa</span>
+        </button>
+        <button onclick="scrollToMenu()" class="flex flex-col items-center text-gray-600 hover:text-brand-red">
+            <i class="fa-solid fa-utensils text-lg"></i>
+            <span class="text-xs font-semibold">Menyu</span>
+        </button>
+        <button onclick="openCartDrawer()" class="flex flex-col items-center text-brand-red relative">
+            <i class="fa-solid fa-bag-shopping text-xl"></i>
+            <span class="text-xs font-bold">Savat</span>
+            <span id="mobileCartBadge" class="absolute -top-1 -right-2 bg-brand-yellow text-black font-black text-xs rounded-full h-4 w-4 flex items-center justify-center">0</span>
+        </button>
+        <button onclick="handleUserAuthClick()" class="flex flex-col items-center text-gray-600 hover:text-brand-red">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span class="text-xs font-semibold">Kabinet</span>
+        </button>
+    </div>
+
+    <!-- SHOPPING CART SLIDING DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black/60 modal-blur" onclick="closeCartDrawer()"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                <!-- Cart Header -->
+                <div class="p-6 bg-warmBg border-b border-orange-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-bag-shopping text-2xl text-brand-red"></i>
+                        <h2 class="text-xl font-black text-gray-900">Sizning Savatingiz</h2>
+                    </div>
+                    <button onclick="closeCartDrawer()" class="text-gray-400 hover:text-gray-700 text-2xl">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Items Container -->
+                <div id="cartItemsList" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Dynamic Cart Items Rendered via JS -->
+                </div>
+
+                <!-- Cart Footer & Checkout -->
+                <div class="p-6 bg-white border-t border-gray-100 space-y-4 shadow-lg">
+                    <!-- Coupon Code Input -->
+                    <div class="flex gap-2">
+                        <input type="text" id="couponInput" placeholder="Promokod (masalan: MAZZALI10)" class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm uppercase focus:outline-none focus:border-brand-red">
+                        <button onclick="handleApplyCoupon()" class="bg-gray-800 hover:bg-black text-white font-bold px-4 py-2 rounded-xl text-sm transition">Qo'llash</button>
+                    </div>
+
+                    <!-- Price Calculations -->
+                    <div class="space-y-1 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Mahsulotlar summasi:</span>
+                            <span id="cartSubtotal" class="font-bold text-gray-800">0 so'm</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Yetkazib berish:</span>
+                            <span id="cartDeliveryFee" class="font-bold text-gray-800">15 000 so'm</span>
+                        </div>
+                        <div id="discountRow" class="flex justify-between text-green-600 hidden">
+                            <span>Chegirma (Promokod):</span>
+                            <span id="cartDiscount" class="font-bold">-0 so'm</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-black text-gray-900 pt-2 border-t border-gray-200">
+                            <span>Jami summa:</span>
+                            <span id="cartGrandTotal" class="text-brand-red">0 so'm</span>
+                        </div>
+                    </div>
+
+                    <button onclick="openCheckoutModal()" class="w-full bg-brand-red hover:bg-red-700 text-white font-black py-4 rounded-2xl shadow-xl text-center text-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Buyurtmani Rasmiylashtirish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL QUICK MODAL -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden modal-blur bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col md:flex-row">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-gray-700 flex items-center justify-center shadow">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-full md:w-1/2 bg-warmBg p-6 flex items-center justify-center">
+                <img id="modalProductImg" src="" alt="Product Image" class="max-h-64 object-contain drop-shadow-xl rounded-2xl">
+            </div>
+            <div class="w-full md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <span id="modalProductCategory" class="text-xs font-bold text-brand-orange uppercase">Kategoriya</span>
+                    <h3 id="modalProductTitle" class="text-2xl font-black text-gray-900 mt-1">Mahsulot Nomi</h3>
+                    <p id="modalProductDesc" class="text-sm text-gray-600 mt-2">Tarkibi va ta'rifi ko'rsatiladi.</p>
+
+                    <!-- Size Selector -->
+                    <div class="mt-4">
+                        <label class="text-xs font-bold text-gray-700 uppercase block mb-2">O'lchamini tanlang:</label>
+                        <div class="grid grid-cols-3 gap-2" id="modalSizeOptions">
+                            <button onclick="setModalSize('Standart', 0)" class="size-btn border-2 border-brand-red bg-red-50 text-brand-red font-bold py-2 rounded-xl text-xs">Standart</button>
+                            <button onclick="setModalSize('Katta (+10,000)', 10000)" class="size-btn border border-gray-200 text-gray-700 font-bold py-2 rounded-xl text-xs">Katta (+10k)</button>
+                            <button onclick="setModalSize('Mega (+18,000)', 18000)" class="size-btn border border-gray-200 text-gray-700 font-bold py-2 rounded-xl text-xs">Mega (+18k)</button>
+                        </div>
+                    </div>
+
+                    <!-- Toppings Selection -->
+                    <div class="mt-4">
+                        <label class="text-xs font-bold text-gray-700 uppercase block mb-2">Qo'shimchalar (Toppings):</label>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center justify-between p-2 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer">
+                                <span><input type="checkbox" onchange="toggleTopping(this, 5000)" value="Pishloq (Cheese)" class="rounded text-brand-red mr-2"> Pishloq (Cheese)</span>
+                                <span class="font-bold text-gray-700">+5 000 so'm</span>
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer">
+                                <span><input type="checkbox" onchange="toggleTopping(this, 4000)" value="Jalapeno achchiq murch" class="rounded text-brand-red mr-2"> Jalapeno murch</span>
+                                <span class="font-bold text-gray-700">+4 000 so'm</span>
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer">
+                                <span><input type="checkbox" onchange="toggleTopping(this, 3000)" value="Maxsus Sous" class="rounded text-brand-red mr-2"> Maxsus Lazzat Sous</span>
+                                <span class="font-bold text-gray-700">+3 000 so'm</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <!-- Quantity Counter -->
+                    <div class="flex items-center border border-gray-300 rounded-xl bg-gray-50">
+                        <button onclick="adjustModalQty(-1)" class="w-9 h-9 flex items-center justify-center font-bold text-gray-600 hover:text-brand-red">-</button>
+                        <span id="modalQty" class="w-8 text-center font-bold text-gray-800">1</span>
+                        <button onclick="adjustModalQty(1)" class="w-9 h-9 flex items-center justify-center font-bold text-gray-600 hover:text-brand-red">+</button>
+                    </div>
+
+                    <!-- Price & Add Button -->
+                    <div class="text-right">
+                        <div id="modalTotalPrice" class="text-xl font-black text-brand-red">0 so'm</div>
+                        <button onclick="addModalItemToCart()" class="bg-brand-red hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl shadow text-sm mt-1">
+                            Savatga Qo'shish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden modal-blur bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-truck-ramp-box text-brand-red"></i> Buyurtmani Rasmiylashtirish
+            </h3>
+
+            <form id="checkoutForm" onsubmit="handlePlaceOrder(event)" class="space-y-4">
+                <!-- Name -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Ism va Familiya *</label>
+                    <input type="text" id="orderName" required placeholder="Masalan: Alisher Navoiy" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Telefon Raqam *</label>
+                    <input type="tel" id="orderPhone" required value="+998 " placeholder="+998 90 123 45 67" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red font-mono">
+                </div>
+
+                <!-- Delivery Type Option -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Yetkazib Berish Usuli *</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 border-2 border-brand-red bg-red-50 p-3 rounded-xl cursor-pointer">
+                            <input type="radio" name="deliveryType" value="delivery" checked onchange="toggleAddressInput(true)" class="text-brand-red">
+                            <span class="text-xs font-bold text-gray-800"><i class="fa-solid fa-house text-brand-red mr-1"></i> Xonadonga</span>
+                        </label>
+                        <label class="flex items-center gap-2 border border-gray-200 p-3 rounded-xl cursor-pointer">
+                            <input type="radio" name="deliveryType" value="pickup" onchange="toggleAddressInput(false)" class="text-brand-red">
+                            <span class="text-xs font-bold text-gray-800"><i class="fa-solid fa-store text-brand-orange mr-1"></i> Olib ketish</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Delivery Address -->
+                <div id="addressFieldGroup">
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Yetkazib berish manzili *</label>
+                    <textarea id="orderAddress" rows="2" placeholder="Toshkent sh., Chilonzor tumani, 10-mavze, 12-uy, 45-xobadon" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-brand-red"></textarea>
+                </div>
+
+                <!-- Payment Method -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">To'lov Usuli *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex items-center justify-center p-3 border-2 border-brand-red bg-red-50 rounded-xl cursor-pointer text-xs font-bold text-gray-800">
+                            <input type="radio" name="paymentMethod" value="Naqd pul" checked class="hidden"> Naqd Pul
+                        </label>
+                        <label class="flex items-center justify-center p-3 border border-gray-200 rounded-xl cursor-pointer text-xs font-bold text-gray-800">
+                            <input type="radio" name="paymentMethod" value="Uzcard / Humo" class="hidden"> Uzcard/Humo
+                        </label>
+                        <label class="flex items-center justify-center p-3 border border-gray-200 rounded-xl cursor-pointer text-xs font-bold text-gray-800">
+                            <input type="radio" name="paymentMethod" value="Payme / Click" class="hidden"> Payme / Click
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Izoh (ixtiyoriy)</label>
+                    <input type="text" id="orderNotes" placeholder="Masalan: Domofon kodi 14K, eshik oldida qoldiring" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-brand-red">
+                </div>
+
+                <!-- Summary Box -->
+                <div class="bg-warmBg p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
+                    <span class="text-sm font-bold text-gray-700">Jami To'lov Summasi:</span>
+                    <span id="checkoutTotalDisplay" class="text-2xl font-black text-brand-red">0 so'm</span>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-red hover:bg-red-700 text-white font-black py-4 rounded-2xl shadow-xl text-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Buyurtmani Tasdiqlash
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- USER AUTH / PROFILE MODAL -->
+    <div id="userModal" class="fixed inset-0 z-50 hidden modal-blur bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 relative">
+            <button onclick="closeUserModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Auth Form View -->
+            <div id="authView">
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button onclick="toggleAuthTab('login')" id="tabLogin" class="flex-1 pb-3 text-center font-bold active-tab">Kirish</button>
+                    <button onclick="toggleAuthTab('register')" id="tabRegister" class="flex-1 pb-3 text-center font-bold text-gray-400">Ro'yxatdan o'tish</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Telefon Raqam</label>
+                        <input type="tel" required placeholder="+998 90 123 45 67" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Parol</label>
+                        <input type="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                    </div>
+                    <button type="submit" class="w-full bg-brand-red hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow">Kirish</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Ism va Familiya</label>
+                        <input type="text" id="regName" required placeholder="Sardor Rahimxon" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Telefon Raqam</label>
+                        <input type="tel" id="regPhone" required placeholder="+998 90 123 45 67" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Parol yaratish</label>
+                        <input type="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-red">
+                    </div>
+                    <button type="submit" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow">Ro'yxatdan O'tish</button>
+                </form>
+            </div>
+
+            <!-- Logged In Profile View -->
+            <div id="profileView" class="hidden text-center space-y-4">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-brand-red to-brand-orange text-white flex items-center justify-center text-3xl font-black mx-auto shadow-lg">
+                    <span id="userAvatarChar">A</span>
+                </div>
+                <h3 id="profileUserName" class="text-2xl font-black text-gray-900">Mijoz Ismi</h3>
+                <p id="profileUserPhone" class="text-sm text-gray-500">+998 90 123 45 67</p>
+
+                <div class="bg-warmBg p-4 rounded-2xl border border-orange-100 text-left space-y-2">
+                    <h4 class="font-bold text-xs uppercase text-gray-500">Buyurtmalar tarixi</h4>
+                    <div id="userOrderHistory" class="text-xs space-y-2 max-h-40 overflow-y-auto">
+                        <p class="text-gray-400">Hali buyurtmalar yo'q</p>
+                    </div>
+                </div>
+
+                <button onclick="handleLogout()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm transition">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Tizimdan Chiqish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL ADMIN DASHBOARD MODAL -->
+    <div id="adminModal" class="fixed inset-0 z-50 hidden modal-blur bg-black/70 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden h-[90vh] flex flex-col">
+            <!-- Admin Header -->
+            <div class="bg-gray-900 text-white p-6 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-red flex items-center justify-center text-white text-xl">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">Lazzat Admin Paneli</h3>
+                        <p class="text-xs text-gray-400">Boshqaruv Tizimi & Real-Vaqt Statistika</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Admin Body Tabs -->
+            <div class="flex border-b border-gray-200 bg-gray-50 px-6">
+                <button onclick="switchAdminTab('stats')" id="adminTabStats" class="py-3 px-4 font-bold text-brand-red border-b-2 border-brand-red text-sm">Statistika</button>
+                <button onclick="switchAdminTab('orders')" id="adminTabOrders" class="py-3 px-4 font-bold text-gray-500 hover:text-gray-800 text-sm">Buyurtmalar Boshqaruvi</button>
+                <button onclick="switchAdminTab('products')" id="adminTabProducts" class="py-3 px-4 font-bold text-gray-500 hover:text-gray-800 text-sm">Mahsulotlar (CRUD)</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 bg-warmBg">
+                <!-- TAB 1: STATS -->
+                <div id="adminViewStats" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Jami Tushum</p>
+                                <h4 id="adminStatRevenue" class="text-2xl font-black text-gray-900 mt-1">1,450,000 so'm</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-wallet"></i></div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Bugungi Buyurtmalar</p>
+                                <h4 id="adminStatOrdersCount" class="text-2xl font-black text-gray-900 mt-1">14 ta</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-orange-100 text-brand-orange flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-boxes-packing"></i></div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Mijozlar Soni</p>
+                                <h4 class="text-2xl font-black text-gray-900 mt-1">128 ta</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-red-100 text-brand-red flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="font-bold text-gray-800 mb-4">Eng Ko'p Sotilgan Taomlar</h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center pb-2 border-b">
+                                <span class="font-bold text-gray-800">1. Cheese Burger Deluxe</span>
+                                <span class="bg-orange-100 text-brand-orange font-bold px-3 py-1 rounded-full text-xs">420 ta sotildi</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-2 border-b">
+                                <span class="font-bold text-gray-800">2. Klasik Lavash Mol Go'shti</span>
+                                <span class="bg-orange-100 text-brand-orange font-bold px-3 py-1 rounded-full text-xs">310 ta sotildi</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-gray-800">3. Pepperoni Pitsa 30sm</span>
+                                <span class="bg-orange-100 text-brand-orange font-bold px-3 py-1 rounded-full text-xs">280 ta sotildi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: ORDERS MANAGER -->
+                <div id="adminViewOrders" class="hidden space-y-4">
+                    <h4 class="font-bold text-lg text-gray-800">Barcha Buyurtmalar Ro'yxati</h4>
+                    <div class="overflow-x-auto bg-white rounded-2xl border border-gray-200">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-gray-100 text-xs font-bold uppercase text-gray-600">
+                                <tr>
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Mijoz</th>
+                                    <th class="p-3">Telefon</th>
+                                    <th class="p-3">Summa</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminOrdersTableBody" class="divide-y divide-gray-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: PRODUCTS CRUD -->
+                <div id="adminViewProducts" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-lg text-gray-800">Mahsulotlarni Boshqarish</h4>
+                        <button onclick="openAddProductModal()" class="bg-brand-red hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-sm shadow">
+                            <i class="fa-solid fa-plus mr-1"></i> Yangi Taom Qo'shish
+                        </button>
+                    </div>
+
+                    <div id="adminProductList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed top-24 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- MAIN JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. INITIAL STATE & PRODUCT DATA CATALOG (20 Products)
+           ========================================================================== */
+        const INITIAL_PRODUCTS = [
+            {
+                id: 1,
+                name: "Cheese Burger Deluxe",
+                category: "burgerlar",
+                price: 38000,
+                rating: 4.9,
+                badge: "Mashhur",
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80",
+                desc: "Yangi mol go'shtidan kotleta, eritilgan Cheddar pishlog'i, marinadlangan bodring va Lazzat sousi."
+            },
+            {
+                id: 2,
+                name: "Double Smash Burger",
+                category: "burgerlar",
+                price: 52000,
+                rating: 5.0,
+                badge: "Yangi",
+                image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80",
+                desc: "Ikkita suvli smash kotleta, double pishloq va qovurilgan piyoz."
+            },
+            {
+                id: 3,
+                name: "Chef Special Burger",
+                category: "burgerlar",
+                price: 48000,
+                rating: 4.8,
+                badge: "-15%",
+                image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=500&q=80",
+                desc: "Oshpazimizning maxsus burgeri: bekon bo'laklari va BBQ sousi bilan."
+            },
+            {
+                id: 4,
+                name: "Klasik Lavash Mol Go'shti",
+                category: "lavashlar",
+                price: 34000,
+                rating: 4.9,
+                badge: "Top Seller",
+                image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=500&q=80",
+                desc: "Ingichka lavash nonida sarxil mol go me'yori, bodring, pomidor va chips."
+            },
+            {
+                id: 5,
+                name: "Achchiq Lavash Cheese",
+                category: "lavashlar",
+                price: 37000,
+                rating: 4.7,
+                badge: "Achchiq",
+                image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&w=500&q=80",
+                desc: "Jalapeno murchi va serob eritilgan pishloqli achchiq lavash."
+            },
+            {
+                id: 6,
+                name: "Pepperoni Pitsa 30sm",
+                category: "pitsalar",
+                price: 75000,
+                rating: 4.9,
+                badge: "Mashhur",
+                image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=500&q=80",
+                desc: "Motsarella pishlog'i va sifatli achchiq pepperoni kolbasasi."
+            },
+            {
+                id: 7,
+                name: "Go'shtli Go'sht Pitsa 35sm",
+                category: "pitsalar",
+                price: 92000,
+                rating: 5.0,
+                badge: "Mega",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=500&q=80",
+                desc: "Mol go'shti, tovuq go'shti, kolbasa hamda maxsus tamat sousi."
+            },
+            {
+                id: 8,
+                name: "Margarita Pitsa Klasik",
+                category: "pitsalar",
+                price: 60000,
+                rating: 4.6,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=500&q=80",
+                desc: "Klassik italiyan retsepti: pomidorlar va Motsarella pishlog'i."
+            },
+            {
+                id: 9,
+                name: "Hot-Dog Special XL",
+                category: "hot-doglar",
+                price: 24000,
+                rating: 4.7,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?auto=format&fit=crop&w=500&q=80",
+                desc: "Yumshoq bulochka, sifatli sosiska, qarsillagan chips va xardal."
+            },
+            {
+                id: 10,
+                name: "Pishloqli Hot-Dog Supreme",
+                category: "hot-doglar",
+                price: 28000,
+                rating: 4.8,
+                badge: "Yangi",
+                image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&w=500&q=80",
+                desc: "Ustiga eritilgan issiq pishloq va ko'katlar sepilgan hot-dog."
+            },
+            {
+                id: 11,
+                name: "Tovuqli Club Sendvich",
+                category: "sendvichlar",
+                price: 32000,
+                rating: 4.8,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=80",
+                desc: "Qovurilgan tost noni, tovuq bifshteksi, salat bargi va mayonez."
+            },
+            {
+                id: 12,
+                name: "Kartoshka Fri Katta",
+                category: "fri kartoshka",
+                price: 18000,
+                rating: 4.9,
+                badge: "Mashhur",
+                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80",
+                desc: "Qarsillama tilla rang kartoshka fri, ketchupsiz tasavvur etib bo'lmaydi."
+            },
+            {
+                id: 13,
+                name: "Kartoshka Po-Derevenski",
+                category: "fri kartoshka",
+                price: 22000,
+                rating: 4.8,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=500&q=80",
+                desc: "Pechda ziravorlar bilan pishirilgan qishloqcha kartoshka bo'laklari."
+            },
+            {
+                id: 14,
+                name: "Coca-Cola 1.5L Sovuq",
+                category: "ichimliklar",
+                price: 15000,
+                rating: 5.0,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80",
+                desc: "Muzdek Coca-Cola 1.5 litr idishda."
+            },
+            {
+                id: 15,
+                name: "Fanta Orange 0.5L",
+                category: "ichimliklar",
+                price: 9000,
+                rating: 4.7,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?auto=format&fit=crop&w=500&q=80",
+                desc: "Tetiklashtiruvchi apelsin ta'mli Fanta."
+            },
+            {
+                id: 16,
+                name: "Oila Combo Set Mega",
+                category: "setlar",
+                price: 145000,
+                rating: 5.0,
+                badge: "Super Narx",
+                image: "https://images.unsplash.com/photo-1610614819513-58e34989848b?auto=format&fit=crop&w=500&q=80",
+                desc: "4 ta Cheese burger + 2 ta Fri + 1 ta Pepperoni pitsa 30sm + 1.5L Cola."
+            },
+            {
+                id: 17,
+                name: "Student Duo Set",
+                category: "setlar",
+                price: 65000,
+                rating: 4.9,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f6?auto=format&fit=crop&w=500&q=80",
+                desc: "2 ta Burger + 1 ta Fri + 2 ta 0.5L Cola."
+            },
+            {
+                id: 18,
+                name: "Tovuqli Naggetslar 9 ta",
+                category: "fri kartoshka",
+                price: 26000,
+                rating: 4.8,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=500&q=80",
+                desc: "Qarsillama talqondagi tovuq go'shti bo'lakchalari."
+            },
+            {
+                id: 19,
+                name: "Juicy Beef Cheeseburger",
+                category: "burgerlar",
+                price: 40000,
+                rating: 4.7,
+                badge: null,
+                image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80",
+                desc: "Klassik ta'mdagi suvli mol go'shtli burger."
+            },
+            {
+                id: 20,
+                name: "Meva Sharbati Crafteo 1L",
+                category: "ichimliklar",
+                price: 16000,
+                rating: 4.9,
+                badge: "Tabiiy",
+                image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=500&q=80",
+                desc: "Tabiiy olma va olcha meva sharbati."
+            }
+        ];
+
+        // Categories Configuration
+        const CATEGORIES = [
+            { id: "all", label: "Barchasi", icon: "fa-utensils" },
+            { id: "burgerlar", label: "Burgerlar", icon: "fa-burger" },
+            { id: "pitsalar", label: "Pitsalar", icon: "fa-pizza-slice" },
+            { id: "lavashlar", label: "Lavashlar", icon: "fa-scroll" },
+            { id: "hot-doglar", label: "Hot-doglar", icon: "fa-hotdog" },
+            { id: "sendvichlar", label: "Sendvichlar", icon: "fa-bread-slice" },
+            { id: "fri kartoshka", label: "Fri Kartoshka", icon: "fa-box-tissue" },
+            { id: "ichimliklar", label: "Ichimliklar", icon: "fa-wine-glass" },
+            { id: "setlar", label: "Combo Setlar", icon: "fa-fire" }
+        ];
+
+        /* ==========================================================================
+           2. STATE MANAGEMENT (LocalStorage Synced)
+           ========================================================================== */
+        let products = JSON.parse(localStorage.getItem('lazzat_products')) || INITIAL_PRODUCTS;
+        let cart = JSON.parse(localStorage.getItem('lazzat_cart')) || [];
+        let orders = JSON.parse(localStorage.getItem('lazzat_orders')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('lazzat_user')) || null;
+        let activePromoDiscount = 0; // percentage
+        let activeCategory = 'all';
+
+        // Modal Active Item State
+        let currentModalItem = null;
+        let currentModalSizeExtra = 0;
+        let currentModalSizeName = 'Standart';
+        let currentModalToppings = [];
+        let currentModalQty = 1;
+
+        /* ==========================================================================
+           3. APPLICATION INITIALIZATION
+           ========================================================================== */
+        window.onload = function() {
+            renderCategories();
+            renderProducts();
+            updateCartBadge();
+            renderCartItems();
+            updateUserUI();
+            initCountdown();
+
+            // Load saved state in Admin table if available
+            renderAdminOrders();
+            renderAdminProducts();
+        };
+
+        function saveCart() {
+            localStorage.setItem('lazzat_cart', JSON.stringify(cart));
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function formatUZS(amount) {
+            return amount.toLocaleString('uz-UZ') + " so'm";
+        }
+
+        /* ==========================================================================
+           4. NAVIGATION & CATEGORY RENDER
+           ========================================================================== */
+        function navTo(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToMenu() {
+            document.getElementById('menuSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryBar');
+            container.innerHTML = CATEGORIES.map(cat => `
+                <button onclick="filterCategory('${cat.id}')" 
+                        class="cat-btn px-5 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all flex items-center gap-2 ${activeCategory === cat.id ? 'bg-brand-red text-white shadow-lg scale-105' : 'bg-white border border-gray-200 text-gray-700 hover:border-brand-orange'}">
+                    <i class="fa-solid ${cat.icon}"></i> ${cat.label}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(catId) {
+            activeCategory = catId;
+            renderCategories();
+            renderProducts();
+        }
+
+        /* ==========================================================================
+           5. PRODUCT CATALOG RENDER & SORTING
+           ========================================================================== */
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const sortVal = document.getElementById('sortSelect').value;
+
+            // Filtering
+            let filtered = activeCategory === 'all' 
+                ? [...products] 
+                : products.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase());
+
+            // Sorting
+            if (sortVal === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+            else if (sortVal === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+            else if (sortVal === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+
+            document.getElementById('productCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">Ushbu kategoriyada taomlar topilmadi.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => `
+                <div class="bg-white rounded-3xl p-5 border border-orange-100 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <!-- Top Image Container -->
+                        <div class="relative bg-warmBg rounded-2xl p-4 mb-4 flex items-center justify-center h-48 overflow-hidden">
+                            ${product.badge ? `<span class="absolute top-3 left-3 bg-brand-red text-white font-black text-xs px-2.5 py-1 rounded-full shadow">${product.badge}</span>` : ''}
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-gray-400 hover:text-brand-red flex items-center justify-center shadow-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                            <img src="${product.image}" alt="${product.name}" class="max-h-40 object-contain group-hover:scale-110 transition duration-500">
+                        </div>
+
+                        <!-- Rating & Category -->
+                        <div class="flex items-center justify-between text-xs font-bold text-gray-500 mb-1">
+                            <span class="uppercase text-brand-orange">${product.category}</span>
+                            <span class="text-yellow-500"><i class="fa-solid fa-star mr-1"></i>${product.rating}</span>
+                        </div>
+
+                        <!-- Title & Description -->
+                        <h3 class="font-black text-lg text-gray-900 leading-snug mb-1 group-hover:text-brand-red transition">${product.name}</h3>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-4">${product.desc}</p>
+                    </div>
+
+                    <!-- Price & Actions -->
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">Narxi</span>
+                            <span class="text-lg font-black text-brand-red">${formatUZS(product.price)}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openProductModal(${product.id})" class="w-10 h-10 rounded-xl bg-orange-100 text-brand-orange hover:bg-brand-orange hover:text-white flex items-center justify-center transition" title="Batafsil">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button onclick="quickAddToCart(${product.id})" class="w-10 h-10 rounded-xl bg-brand-red hover:bg-red-700 text-white flex items-center justify-center shadow-md transition" title="Savatga qo'shish">
+                                <i class="fa-solid fa-plus font-bold"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSortChange() {
+            renderProducts();
+        }
+
+        /* ==========================================================================
+           6. SEARCH MODAL LOGIC
+           ========================================================================== */
+        function toggleSearchModal() {
+            const modal = document.getElementById('searchModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (!query.trim()) {
+                resultsContainer.innerHTML = `<p class="text-gray-400 text-center py-6">Qidirmoqchi bo'lgan taomingiz nomini kiriting...</p>`;
+                return;
+            }
+
+            const matches = products.filter(p => p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = `<p class="text-gray-500 text-center py-6">"<strong>${query}</strong>" bo'yicha hech narsa topilmadi.</p>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = matches.map(p => `
+                <div class="py-3 flex items-center justify-between hover:bg-gray-50 px-3 rounded-xl transition cursor-pointer" onclick="toggleSearchModal(); openProductModal(${p.id})">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-12 h-12 object-contain rounded-lg bg-warmBg" alt="${p.name}">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">${p.name}</h4>
+                            <span class="text-xs text-brand-orange uppercase font-semibold">${p.category}</span>
+                        </div>
+                    </div>
+                    <span class="font-black text-brand-red text-sm">${formatUZS(p.price)}</span>
+                </div>
+            `).join('');
+        }
+
+        /* ==========================================================================
+           7. PRODUCT DETAIL MODAL & CUSTOMIZATION
+           ========================================================================== */
+        function openProductModal(id) {
+            const item = products.find(p => p.id === id);
+            if (!item) return;
+
+            currentModalItem = item;
+            currentModalSizeExtra = 0;
+            currentModalSizeName = 'Standart';
+            currentModalToppings = [];
+            currentModalQty = 1;
+
+            document.getElementById('modalProductImg').src = item.image;
+            document.getElementById('modalProductTitle').textContent = item.name;
+            document.getElementById('modalProductCategory').textContent = item.category;
+            document.getElementById('modalProductDesc').textContent = item.desc;
+            document.getElementById('modalQty').textContent = currentModalQty;
+
+            // Reset size buttons styling
+            const buttons = document.querySelectorAll('#modalSizeOptions button');
+            buttons.forEach((btn, idx) => {
+                if (idx === 0) {
+                    btn.className = "size-btn border-2 border-brand-red bg-red-50 text-brand-red font-bold py-2 rounded-xl text-xs";
+                } else {
+                    btn.className = "size-btn border border-gray-200 text-gray-700 font-bold py-2 rounded-xl text-xs";
+                }
+            });
+
+            // Uncheck checkboxes
+            document.querySelectorAll('#productModal input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+            updateModalPriceDisplay();
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        function setModalSize(sizeName, extraPrice) {
+            currentModalSizeName = sizeName;
+            currentModalSizeExtra = extraPrice;
+
+            const buttons = document.querySelectorAll('#modalSizeOptions button');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(sizeName.split(' ')[0])) {
+                    btn.className = "size-btn border-2 border-brand-red bg-red-50 text-brand-red font-bold py-2 rounded-xl text-xs";
+                } else {
+                    btn.className = "size-btn border border-gray-200 text-gray-700 font-bold py-2 rounded-xl text-xs";
+                }
+            });
+
+            updateModalPriceDisplay();
+        }
+
+        function toggleTopping(checkbox, price) {
+            if (checkbox.checked) {
+                currentModalToppings.push({ name: checkbox.value, price: price });
+            } else {
+                currentModalToppings = currentModalToppings.filter(t => t.name !== checkbox.value);
+            }
+            updateModalPriceDisplay();
+        }
+
+        function adjustModalQty(delta) {
+            if (currentModalQty + delta >= 1) {
+                currentModalQty += delta;
+                document.getElementById('modalQty').textContent = currentModalQty;
+                updateModalPriceDisplay();
+            }
+        }
+
+        function updateModalPriceDisplay() {
+            if (!currentModalItem) return;
+            const toppingsPriceSum = currentModalToppings.reduce((sum, t) => sum + t.price, 0);
+            const unitPrice = currentModalItem.price + currentModalSizeExtra + toppingsPriceSum;
+            const totalPrice = unitPrice * currentModalQty;
+            document.getElementById('modalTotalPrice').textContent = formatUZS(totalPrice);
+        }
+
+        function addModalItemToCart() {
+            if (!currentModalItem) return;
+
+            const toppingsPriceSum = currentModalToppings.reduce((sum, t) => sum + t.price, 0);
+            const finalUnitPrice = currentModalItem.price + currentModalSizeExtra + toppingsPriceSum;
+
+            const cartItem = {
+                cartId: Date.now() + Math.random(),
+                productId: currentModalItem.id,
+                name: currentModalItem.name,
+                image: currentModalItem.image,
+                size: currentModalSizeName,
+                toppings: currentModalToppings.map(t => t.name),
+                unitPrice: finalUnitPrice,
+                quantity: currentModalQty
+            };
+
+            cart.push(cartItem);
+            saveCart();
+            closeProductModal();
+            showToast(`${currentModalItem.name} savatga qo'shildi!`);
+        }
+
+        function quickAddToCart(id) {
+            const item = products.find(p => p.id === id);
+            if (!item) return;
+
+            const existing = cart.find(c => c.productId === id && c.size === 'Standart' && c.toppings.length === 0);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({
+                    cartId: Date.now(),
+                    productId: item.id,
+                    name: item.name,
+                    image: item.image,
+                    size: 'Standart',
+                    toppings: [],
+                    unitPrice: item.price,
+                    quantity: 1
+                });
+            }
+            saveCart();
+            showToast(`${item.name} savatga qo'shildi!`);
+        }
+
+        /* ==========================================================================
+           8. SHOPPING CART DRAWER & COMPUTATIONS
+           ========================================================================== */
+        function openCartDrawer() {
+            document.getElementById('cartDrawer').classList.remove('hidden');
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cartDrawer').classList.add('hidden');
+        }
+
+        function updateCartBadge() {
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCountBadge').textContent = totalCount;
+            document.getElementById('mobileCartBadge').textContent = totalCount;
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItemsList');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 text-gray-400">
+                        <i class="fa-solid fa-basket-shopping text-5xl mb-3 text-orange-200"></i>
+                        <p class="font-bold text-gray-600 text-lg">Savatingiz hozircha bo'sh</p>
+                        <p class="text-xs mt-1">Lazzatli taomlarimizni tatib ko'rish vaqti keldi!</p>
+                        <button onclick="closeCartDrawer(); scrollToMenu();" class="mt-4 bg-brand-red text-white font-bold px-4 py-2 rounded-xl text-xs shadow">Menyuga O'tish</button>
+                    </div>
+                `;
+                calculateCartTotals(0);
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.unitPrice * item.quantity;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="flex items-center gap-4 bg-warmBg p-3 rounded-2xl border border-orange-100 shadow-sm">
+                        <img src="${item.image}" class="w-16 h-16 object-contain rounded-xl bg-white p-1" alt="${item.name}">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900 text-sm leading-tight">${item.name}</h4>
+                            <p class="text-xs text-brand-orange font-semibold">${item.size} ${item.toppings.length ? `(+${item.toppings.join(', ')})` : ''}</p>
+                            <span class="text-xs font-black text-brand-red block mt-1">${formatUZS(item.unitPrice)}</span>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <button onclick="removeCartItem(${item.cartId})" class="text-gray-400 hover:text-brand-red text-sm">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                            <div class="flex items-center border border-gray-200 rounded-lg bg-white">
+                                <button onclick="updateCartQty(${item.cartId}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-xs text-gray-600">-</button>
+                                <span class="w-6 text-center text-xs font-bold">${item.quantity}</span>
+                                <button onclick="updateCartQty(${item.cartId}, 1)" class="w-6 h-6 flex items-center justify-center font-bold text-xs text-gray-600">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            calculateCartTotals(subtotal);
+        }
+
+        function updateCartQty(cartId, delta) {
+            const item = cart.find(c => c.cartId === cartId);
+            if (item) {
+                if (item.quantity + delta >= 1) {
+                    item.quantity += delta;
+                } else {
+                    cart = cart.filter(c => c.cartId !== cartId);
+                }
+                saveCart();
+            }
+        }
+
+        function removeCartItem(cartId) {
+            cart = cart.filter(c => c.cartId !== cartId);
+            saveCart();
+            showToast("Mahsulot savatdan o'chirildi");
+        }
+
+        function calculateCartTotals(subtotal) {
+            const deliveryFee = subtotal >= 100000 || subtotal === 0 ? 0 : 15000;
+            const discountAmount = Math.round(subtotal * (activePromoDiscount / 100));
+            const grandTotal = subtotal + deliveryFee - discountAmount;
+
+            document.getElementById('cartSubtotal').textContent = formatUZS(subtotal);
+            document.getElementById('cartDeliveryFee').textContent = deliveryFee === 0 && subtotal > 0 ? "BEPUL" : formatUZS(deliveryFee);
+            
+            if (activePromoDiscount > 0) {
+                document.getElementById('discountRow').classList.remove('hidden');
+                document.getElementById('cartDiscount').textContent = `-${formatUZS(discountAmount)}`;
+            } else {
+                document.getElementById('discountRow').classList.add('hidden');
+            }
+
+            document.getElementById('cartGrandTotal').textContent = formatUZS(grandTotal);
+            document.getElementById('checkoutTotalDisplay').textContent = formatUZS(grandTotal);
+        }
+
+        function handleApplyCoupon() {
+            const code = document.getElementById('couponInput').value.trim().toUpperCase();
+            if (code === 'MAZZALI10') {
+                activePromoDiscount = 10;
+                showToast("10% chegirma promokodi qo'llanildi!");
+                renderCartItems();
+            } else if (code === 'JUMA1PLUS1') {
+                activePromoDiscount = 15;
+                showToast("Juma aktsiya kodi qo'llanildi (15% chegirma)!");
+                renderCartItems();
+            } else {
+                showToast("Noto'g'ri promokod kiritildi", "error");
+            }
+        }
+
+        function applyPromoCode(code) {
+            document.getElementById('couponInput').value = code;
+            openCartDrawer();
+            handleApplyCoupon();
+        }
+
+        /* ==========================================================================
+           9. CHECKOUT & ORDER SUBMISSION
+           ========================================================================== */
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast("Rasmiylashtirish uchun savatingizga taom qo'shing!", "error");
+                return;
+            }
+            closeCartDrawer();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function toggleAddressInput(isDelivery) {
+            const group = document.getElementById('addressFieldGroup');
+            if (isDelivery) {
+                group.classList.remove('hidden');
+                document.getElementById('orderAddress').required = true;
+            } else {
+                group.classList.add('hidden');
+                document.getElementById('orderAddress').required = false;
+            }
+        }
+
+        function handlePlaceOrder(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('orderName').value;
+            const phone = document.getElementById('orderPhone').value;
+            const address = document.getElementById('orderAddress').value;
+            const notes = document.getElementById('orderNotes').value;
+            const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+            const deliveryFee = deliveryType === 'pickup' || subtotal >= 100000 ? 0 : 15000;
+            const discount = Math.round(subtotal * (activePromoDiscount / 100));
+            const total = subtotal + deliveryFee - discount;
+
+            const newOrder = {
+                id: '#ORD-' + Math.floor(1000 + Math.random() * 9000),
+                date: new Date().toLocaleString('uz-UZ'),
+                customerName: name,
+                customerPhone: phone,
+                address: deliveryType === 'pickup' ? "Restorandan olib ketish" : address,
+                notes: notes,
+                items: [...cart],
+                total: total,
+                statusStep: 1, // 1 to 5
+                statusLabel: 'Buyurtma qabul qilindi',
+                paymentMethod: paymentMethod
+            };
+
+            orders.unshift(newOrder);
+            localStorage.setItem('lazzat_orders', JSON.stringify(orders));
+
+            // Empty cart
+            cart = [];
+            saveCart();
+
+            closeCheckoutModal();
+            showToast("Buyurtmangiz muvaffaqiyatli qabul qilindi!");
+
+            // Show Live Order Tracker
+            showActiveOrderTracker(newOrder);
+            renderAdminOrders();
+        }
+
+        /* ==========================================================================
+           10. LIVE ORDER TRACKER SYSTEM
+           ========================================================================== */
+        let activeOrderObj = null;
+
+        function showActiveOrderTracker(order) {
+            activeOrderObj = order;
+            const section = document.getElementById('activeOrderSection');
+            section.classList.remove('hidden');
+            section.scrollIntoView({ behavior: 'smooth' });
+
+            document.getElementById('trackerOrderId').textContent = order.id;
+            document.getElementById('trackerAddress').textContent = order.address;
+
+            updateTrackerVisuals(order.statusStep);
+        }
+
+        function updateTrackerVisuals(step) {
+            const bar = document.getElementById('trackerProgressBar');
+            const percentage = (step / 5) * 100;
+            bar.style.width = percentage + '%';
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (i <= step) {
+                    el.className = "text-brand-red font-bold";
+                    el.querySelector('div').className = "w-8 h-8 mx-auto mb-1 rounded-full bg-brand-red text-white flex items-center justify-center text-sm shadow";
+                } else {
+                    el.className = "text-gray-400 font-normal";
+                    el.querySelector('div').className = "w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200 flex items-center justify-center text-sm";
+                }
+            }
+        }
+
+        function simulateNextStatus() {
+            if (!activeOrderObj) return;
+            if (activeOrderObj.statusStep < 5) {
+                activeOrderObj.statusStep++;
+                const statusNames = ["", "Buyurtma qabul qilindi", "Tayyorlanmoqda", "Kuryerga topshirildi", "Yo'lda", "Yetkazib berildi"];
+                activeOrderObj.statusLabel = statusNames[activeOrderObj.statusStep];
+                updateTrackerVisuals(activeOrderObj.statusStep);
+                showToast(`Buyurtma holati o'zgardi: ${activeOrderObj.statusLabel}`);
+                renderAdminOrders();
+            } else {
+                showToast("Buyurtma allaqachon yetkazib berilgan!", "info");
+            }
+        }
+
+        function showActiveOrder() {
+            if (orders.length > 0) {
+                showActiveOrderTracker(orders[0]);
+            } else {
+                showToast("Sizda hali faol buyurtmalar mavjud emas.", "info");
+            }
+        }
+
+        /* ==========================================================================
+           11. USER AUTHENTICATION & PROFILE
+           ========================================================================== */
+        function handleUserAuthClick() {
+            if (currentUser) {
+                openUserProfile();
+            } else {
+                openUserModal();
+            }
+        }
+
+        function openUserModal() {
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function toggleAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('tabLogin').className = "flex-1 pb-3 text-center font-bold active-tab";
+                document.getElementById('tabRegister').className = "flex-1 pb-3 text-center font-bold text-gray-400";
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            } else {
+                document.getElementById('tabRegister').className = "flex-1 pb-3 text-center font-bold active-tab";
+                document.getElementById('tabLogin').className = "flex-1 pb-3 text-center font-bold text-gray-400";
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            currentUser = {
+                name: "Alisher Navoiy",
+                phone: "+998 90 123 45 67"
+            };
+            localStorage.setItem('lazzat_user', JSON.stringify(currentUser));
+            updateUserUI();
+            closeUserModal();
+            showToast("Tizimga muvaffaqiyatli kirdingiz!");
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+
+            currentUser = { name, phone };
+            localStorage.setItem('lazzat_user', JSON.stringify(currentUser));
+            updateUserUI();
+            closeUserModal();
+            showToast("Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!");
+        }
+
+        function updateUserUI() {
+            const userIcon = document.getElementById('userIcon');
+            if (currentUser) {
+                userIcon.className = "fa-solid fa-user-check text-green-600";
+            } else {
+                userIcon.className = "fa-solid fa-user";
+            }
+        }
+
+        function openUserProfile() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('profileView').classList.remove('hidden');
+
+            document.getElementById('profileUserName').textContent = currentUser.name;
+            document.getElementById('profileUserPhone').textContent = currentUser.phone;
+            document.getElementById('userAvatarChar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+            // Order History Render
+            const historyContainer = document.getElementById('userOrderHistory');
+            if (orders.length === 0) {
+                historyContainer.innerHTML = `<p class="text-gray-400">Hali buyurtmalar tarixi mavjud emas.</p>`;
+            } else {
+                historyContainer.innerHTML = orders.map(o => `
+                    <div class="p-2.5 bg-white rounded-xl border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-gray-800">${o.id}</span> - <span class="text-brand-red font-bold">${formatUZS(o.total)}</span>
+                            <p class="text-[10px] text-gray-400">${o.date}</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full bg-orange-100 text-brand-orange text-[10px] font-bold">${o.statusLabel}</span>
+                    </div>
+                `).join('');
+            }
+
+            openUserModal();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('lazzat_user');
+            updateUserUI();
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+            closeUserModal();
+            showToast("Tizimdan chiqdingiz");
+        }
+
+        /* ==========================================================================
+           12. ADMINISTRATOR DASHBOARD CONTROL
+           ========================================================================== */
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            renderAdminOrders();
+            renderAdminProducts();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            ['stats', 'orders', 'products'].forEach(t => {
+                document.getElementById(`adminView${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
+                document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "py-3 px-4 font-bold text-gray-500 hover:text-gray-800 text-sm";
+            });
+
+            document.getElementById(`adminView${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+            document.getElementById(`adminTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "py-3 px-4 font-bold text-brand-red border-b-2 border-brand-red text-sm";
+        }
+
+        function renderAdminOrders() {
+            const tbody = document.getElementById('adminOrdersTableBody');
+            let totalRevenue = 1450000;
+
+            orders.forEach(o => totalRevenue += o.total);
+            document.getElementById('adminStatRevenue').textContent = formatUZS(totalRevenue);
+            document.getElementById('adminStatOrdersCount').textContent = `${orders.length + 14} ta`;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Yangi mijozlar buyurtmalari yo'q.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 font-bold text-gray-900">${o.id}</td>
+                    <td class="p-3">${o.customerName}</td>
+                    <td class="p-3 font-mono text-xs">${o.customerPhone}</td>
+                    <td class="p-3 font-bold text-brand-red">${formatUZS(o.total)}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full bg-orange-100 text-brand-orange text-xs font-bold">${o.statusLabel}</span>
+                    </td>
+                    <td class="p-3">
+                        <button onclick="advanceOrderStatus('${o.id}')" class="bg-brand-red hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                            Statusni yangilash
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function advanceOrderStatus(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.statusStep < 5) {
+                order.statusStep++;
+                const statusNames = ["", "Buyurtma qabul qilindi", "Tayyorlanmoqda", "Kuryerga topshirildi", "Yo'lda", "Yetkazib berildi"];
+                order.statusLabel = statusNames[order.statusStep];
+                localStorage.setItem('lazzat_orders', JSON.stringify(orders));
+                renderAdminOrders();
+                showToast(`${orderId} bosqichi o'zgartirildi`);
+            }
+        }
+
+        function renderAdminProducts() {
+            const container = document.getElementById('adminProductList');
+            container.innerHTML = products.map(p => `
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-12 h-12 object-contain rounded-xl bg-warmBg" alt="${p.name}">
+                        <div>
+                            <h5 class="font-bold text-gray-800 text-sm">${p.name}</h5>
+                            <span class="text-xs text-brand-red font-black">${formatUZS(p.price)}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 p-2 text-sm" title="O'chirish">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('lazzat_products', JSON.stringify(products));
+            renderProducts();
+            renderAdminProducts();
+            showToast("Mahsulot o'chirib tashlandi");
+        }
+
+        function openAddProductModal() {
+            const name = prompt("Yangi taom nomi:");
+            if (!name) return;
+            const price = parseInt(prompt("Narxi (UZS so'mda):") || "30000");
+            const category = prompt("Kategoriya (burgerlar, pitsalar, lavashlar, ichimliklar, setlar):") || "burgerlar";
+
+            const newProd = {
+                id: Date.now(),
+                name: name,
+                category: category.toLowerCase(),
+                price: price,
+                rating: 5.0,
+                badge: "Yangi",
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80",
+                desc: "Yangi qo'shilgan mualliflik taomi."
+            };
+
+            products.unshift(newProd);
+            localStorage.setItem('lazzat_products', JSON.stringify(products));
+            renderProducts();
+            renderAdminProducts();
+            showToast("Yangi taom muvaffaqiyatli qo'shildi!");
+        }
+
+        /* ==========================================================================
+           13. HELPER UTILITIES & UI TOASTS
+           ========================================================================== */
+        function showToast(msg, type = "success") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            const bgClass = type === 'error' ? 'bg-red-600' : type === 'info' ? 'bg-gray-800' : 'bg-brand-red';
+
+            toast.className = `${bgClass} text-white font-bold text-xs py-3 px-5 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce-in pointer-events-auto transition-all`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'} text-base"></i>
+                <span>${msg}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function selectBranch(index) {
+            const cards = document.querySelectorAll('.branch-card');
+            cards.forEach((card, idx) => {
+                if (idx === index) {
+                    card.className = "branch-card bg-white p-5 rounded-2xl border-2 border-brand-red shadow-md cursor-pointer transition";
+                } else {
+                    card.className = "branch-card bg-white p-5 rounded-2xl border border-gray-200 hover:border-brand-orange shadow-sm cursor-pointer transition";
+                }
+            });
+            showToast("Filial manzili tanlandi");
+        }
+
+        function initCountdown() {
+            let seconds = 4 * 3600 + 18 * 60 + 22;
+            setInterval(() => {
+                if (seconds > 0) seconds--;
+                const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const s = String(seconds % 60).padStart(2, '0');
+                const display = document.getElementById('promoCountdown');
+                if (display) display.textContent = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
